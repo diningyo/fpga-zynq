@@ -96,15 +96,15 @@ class ZynqAdapterCore(address: BigInt, beatBytes: Int)(implicit p: Parameters)
       new AXI4RegBundle((), _)    with ZynqAdapterCoreBundle)(
       new AXI4RegModule((), _, _) with ZynqAdapterCoreModule)
 
-class ZynqAdapter(address: BigInt, config: SlavePortParams)(implicit p: Parameters)
+class ZynqAdapter(address: BigInt, config: Option[SlavePortParams])(implicit p: Parameters)
     extends LazyModule {
 
   val node = AXI4MasterNode(Seq(AXI4MasterPortParameters(
     masters = Seq(AXI4MasterParameters(
       name = "Zynq Adapter",
-      id = IdRange(0, 1 << config.idBits))))))
+      id = IdRange(0, 1 << config.get.idBits))))))
 
-  val core = LazyModule(new ZynqAdapterCore(address, config.beatBytes))
+  val core = LazyModule(new ZynqAdapterCore(address, config.get.beatBytes))
   core.node := AXI4Fragmenter() := node
 
   lazy val module = new LazyModuleImp(this) {
