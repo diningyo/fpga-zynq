@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "edu.berkeley.cs",
   version      := "1.2-SNAPSHOT",
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.10",
   parallelExecution in Global := false,
   scalacOptions ++= Seq(
     "-Xsource:2.11",
