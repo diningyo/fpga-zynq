@@ -6,6 +6,7 @@ import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy.{LazyModule, LazyModuleImp}
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.util.DontTouch
+import freechips.rocketchip.devices.debug.Debug
 import testchipip._
 
 case object ZynqAdapterBase extends Field[BigInt]
@@ -28,15 +29,17 @@ class Top(implicit val p: Parameters) extends Module {
   adapter.io.serial <> target.serial
   adapter.io.bdev <> target.bdev
 
-  target.debug := DontCare
+  Debug.tieoffDebug(target.debug, target.psd)
+  target.debug.get.clockeddmi.get.dmi.req := DontCare
+  //target.debug.get := DontCare
   target.tieOffInterrupts()
   target.dontTouchPorts()
   target.reset := adapter.io.sys_reset
 }
 
 class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
+    with HasHierarchicalBusTopology
     with CanHaveMasterAXI4MemPort
-    with HasSystemErrorSlave
     with HasPeripheryBootROM
     with HasSyncExtInterrupts
     with HasNoDebug
