@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "edu.berkeley.cs",
   version      := "1.2-SNAPSHOT",
-  scalaVersion := "2.11.12",
+  scalaVersion := "2.12.4",
   parallelExecution in Global := false,
   scalacOptions ++= Seq(
     "-Xsource:2.11",
@@ -14,8 +14,8 @@ lazy val commonSettings = Seq(
     ),
   libraryDependencies ++= Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value),
   libraryDependencies ++= Seq("org.json4s" %% "json4s-jackson" % "3.6.1"),
-  libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "3.2.0" % "test"),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+  //libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "3.2.0" % "test"),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots"),
     Resolver.sonatypeRepo("releases"),

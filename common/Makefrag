@@ -6,7 +6,7 @@ TOP_MODULE_PROJECT ?= zynq
 TOP_MODULE ?= Top
 CFG_PROJECT ?= $(TOP_MODULE_PROJECT)
 CONFIG ?= ZynqConfig
-SCALA_VERSION=2.11.12
+SCALA_VERSION=2.12.4
 EXTRA_PACKAGES=testchipip
 
 base_dir = $(abspath ..)
@@ -36,11 +36,17 @@ verilog_srcs = \
 bootimage = fpga-images-$(BOARD)/boot.bin
 bootimage: $(bootimage)
 
+#/home/diningyo/workspace/risc-v/rocket/update_fpga-zynq/fpga-zynq-test.git/rocket-chip/emulator/generated-src
+# freechips.rocketchip.system
+# TestHarness
+# freechips.rocketchip.system
+# DefaultConfig
+
 # Taken from rocket chip 2a5aeea. TODO: Maybe source this directly from makefrag?
-SBT ?= java -Xmx2G -Xss8M -XX:MaxMetaspaceSize=512M -jar $(ROCKET_DIR)/sbt-launch.jar
+SBT ?= java -Xmx2G -Xss8M -XX:MaxMetaspaceSize=2G -jar $(ROCKET_DIR)/sbt-launch.jar
 
 FIRRTL_JAR ?= $(ROCKET_DIR)/firrtl/utils/bin/firrtl.jar
-FIRRTL ?= java -Xmx2G -Xss8M -XX:MaxMetaspaceSize=512M -cp $(FIRRTL_JAR) firrtl.Driver
+FIRRTL ?= java -Xmx2G -Xss8M -XX:MaxMetaspaceSize=2G -cp $(FIRRTL_JAR) firrtl.stage.FirrtlMain
 
 $(FIRRTL_JAR): $(shell find $(ROCKET_DIR)/firrtl/src/main/scala -iname "*.scala" 2> /dev/null)
 	$(MAKE) -C $(ROCKET_DIR)/firrtl SBT="$(SBT)" root_dir=$(ROCKET_DIR)/firrtl build-scala
