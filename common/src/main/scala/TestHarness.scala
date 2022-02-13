@@ -8,6 +8,7 @@ import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.diplomacy.{LazyModule, LazyModuleImp}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug.Debug
+import freechips.rocketchip.system.SimAXIMem
 import testchipip._
 import testchipip.SerialAdapter._
 
@@ -18,14 +19,15 @@ class TestHarness(implicit val p: Parameters) extends Module {
 
   val config = p(ExtIn)
   val driver = Module(LazyModule(new TestHarnessDriver).module)
-  val dut = Module(LazyModule(new FPGAZynqTop).module)
+  val ldut = LazyModule(new FPGAZynqTop)
+  val dut = Module(ldut.module)
 
   dut.reset := driver.io.sys_reset
-  Debug.tieoffDebug(dut.debug, dut.psd)
+  Debug.tieoffDebug(dut.debug, Some(dut.psd))
   //dut.debug := DontCare
+  SimAXIMem.connectMem(ldut)
   dut.tieOffInterrupts()
   dut.dontTouchPorts()
-  dut.connectSimAXIMem()
 
   driver.io.serial <> dut.serial
   driver.io.bdev <> dut.bdev

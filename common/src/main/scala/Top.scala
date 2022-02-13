@@ -14,22 +14,23 @@ case object ZynqAdapterBase extends Field[BigInt]
 class Top(implicit val p: Parameters) extends Module {
   val address = p(ZynqAdapterBase)
   val config = p(ExtIn)
-  val target = Module(LazyModule(new FPGAZynqTop).module)
+  val ltarget = LazyModule(new FPGAZynqTop)
+  val target = Module(ltarget.module)
   val adapter = Module(LazyModule(new ZynqAdapter(address, config)).module)
 
-  require(target.mem_axi4.size == 1)
+  require(ltarget.mem_axi4.size == 1)
 
   val io = IO(new Bundle {
     val ps_axi_slave = Flipped(adapter.axi.cloneType)
-    val mem_axi = target.mem_axi4.head.cloneType
+    val mem_axi = ltarget.mem_axi4.head.cloneType
   })
 
-  io.mem_axi <> target.mem_axi4.head
+  io.mem_axi <> ltarget.mem_axi4.head
   adapter.axi <> io.ps_axi_slave
   adapter.io.serial <> target.serial
   adapter.io.bdev <> target.bdev
 
-  Debug.tieoffDebug(target.debug, target.psd)
+  Debug.tieoffDebug(target.debug, Some(target.psd))
   target.debug.get.clockeddmi.get.dmi.req := DontCare
   //target.debug.get := DontCare
   target.tieOffInterrupts()
@@ -50,7 +51,6 @@ class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
 
 class FPGAZynqTopModule(outer: FPGAZynqTop) extends RocketSubsystemModuleImp(outer)
     with HasRTCModuleImp
-    with CanHaveMasterAXI4MemPortModuleImp
     with HasPeripheryBootROMModuleImp
     with HasExtInterruptsModuleImp
     with HasNoDebugModuleImp
