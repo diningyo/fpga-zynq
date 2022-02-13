@@ -38,3 +38,12 @@ zc706/src/verilog/AsyncResetReg.v
 zc706/src/verilog/plusarg_reader.v
 zc706/deliver_output
 zc706/soft_build
+
+.metals/
+.bloop/
+metals.sbt
+target/
+vivado*.jou
+vivado*.log
+vivado*.str
+
