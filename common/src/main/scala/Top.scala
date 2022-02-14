@@ -27,10 +27,11 @@ class Top(implicit val p: Parameters) extends Module {
 
   io.mem_axi <> ltarget.mem_axi4.head
   adapter.axi <> io.ps_axi_slave
-  adapter.io.serial <> target.serial
-  adapter.io.bdev <> target.bdev
+  adapter.io.serial <> target.serial.get
+  adapter.io.bdev <> target.bdev.get
 
-  Debug.tieoffDebug(target.debug, Some(target.psd))
+  Debug.tieoffDebug(target.debug, target.resetctrl, Some(target.psd))
+  target.debug.get.dmactiveAck := false.B
   target.debug.get.clockeddmi.get.dmi.req := DontCare
   //target.debug.get := DontCare
   target.tieOffInterrupts()
@@ -42,10 +43,9 @@ class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
     with HasHierarchicalBusTopology
     with CanHaveMasterAXI4MemPort
     with HasPeripheryBootROM
-    with HasSyncExtInterrupts
-    with HasNoDebug
-    with HasPeripherySerial
-    with HasPeripheryBlockDevice {
+    with HasAsyncExtInterrupts
+    with CanHavePeripherySerial
+    with CanHavePeripheryBlockDevice {
   override lazy val module = new FPGAZynqTopModule(this)
 }
 
@@ -53,7 +53,6 @@ class FPGAZynqTopModule(outer: FPGAZynqTop) extends RocketSubsystemModuleImp(out
     with HasRTCModuleImp
     with HasPeripheryBootROMModuleImp
     with HasExtInterruptsModuleImp
-    with HasNoDebugModuleImp
-    with HasPeripherySerialModuleImp
-    with HasPeripheryBlockDeviceModuleImp
+    with CanHavePeripherySerialModuleImp
+    with CanHavePeripheryBlockDeviceModuleImp
     with DontTouch

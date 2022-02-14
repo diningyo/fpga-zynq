@@ -19,8 +19,9 @@ class WithZynqAdapter extends Config((site, here, up) => {
   case ZynqAdapterBase => BigInt(0x43C00000L)
   //case ExtMem => up(ExtMem, site).map(x => x.copy(master = x.master.copy(idBits = 6)))
   case ExtIn => up(ExtIn, site).map(_.copy(beatBytes = 4, idBits = 12))
-  case BlockDeviceKey => BlockDeviceConfig(nTrackers = 2)
+  case BlockDeviceKey => Some(BlockDeviceConfig(nTrackers = 2))
   case BlockDeviceFIFODepth => 16
+  case SerialKey => true
   case NetworkFIFODepth => 16
 })
 

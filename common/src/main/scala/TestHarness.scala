@@ -23,14 +23,17 @@ class TestHarness(implicit val p: Parameters) extends Module {
   val dut = Module(ldut.module)
 
   dut.reset := driver.io.sys_reset
-  Debug.tieoffDebug(dut.debug, Some(dut.psd))
+  Debug.tieoffDebug(dut.debug, dut.resetctrl, Some(dut.psd))
+
+  dut.debug.get.dmactiveAck := false.B
+  dut.debug.get.clockeddmi.get.dmi.req := DontCare
   //dut.debug := DontCare
   SimAXIMem.connectMem(ldut)
   dut.tieOffInterrupts()
   dut.dontTouchPorts()
 
-  driver.io.serial <> dut.serial
-  driver.io.bdev <> dut.bdev
+  driver.io.serial <> dut.serial.get
+  driver.io.bdev <> dut.bdev.get
   io.success := driver.io.success
 }
 
