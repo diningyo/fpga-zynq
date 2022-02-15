@@ -1,5 +1,5 @@
 package zynq
-
+/*
 import chisel3.stage.{ChiselCli, ChiselStage}
 import firrtl.options.PhaseManager.PhaseDependency
 import firrtl.options.{Phase, PreservesAll, Shell, StageMain}
@@ -22,3 +22,4 @@ class RocketChipStage extends ChiselStage with PreservesAll[Phase] {
 }
 
 object Generator extends StageMain(new RocketChipStage)
+*/

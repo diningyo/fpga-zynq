@@ -97,7 +97,7 @@ PROJECT:=zynq
 
 $(common_build)/$(TOP_MODULE).$(CONFIG).fir: $(rocketchip_stamp) $(extra_stamps) $(bootrom_img) $(call lookup_scala_srcs,$(common))
 	mkdir -p $(@D)
-	cd $(common) && $(SBT) "runMain $(PROJECT).Generator -td $(CHISEL_ARGS) -T $(PROJECT).Top -C $(PROJECT).$(CONFIG) -n Top.$(CONFIG)"
+	cd $(common) && $(SBT) "runMain freechips.rocketchip.system.Generator -td $(CHISEL_ARGS) -T $(PROJECT).Top -C $(PROJECT).$(CONFIG) -n Top.$(CONFIG)"
 
 $(common_build)/$(TOP_MODULE).$(CONFIG).v: $(common_build)/$(TOP_MODULE).$(CONFIG).fir $(FIRRTL_JAR)
 	$(FIRRTL) -i $< -o $@ -X verilog
