@@ -51,6 +51,7 @@ class DefaultConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.system.DefaultConfig)
 class DefaultMediumConfig extends Config(
   new WithBootROM ++ new WithNMediumCores(1) ++
+  new WithCoherentBusTopology ++
   new freechips.rocketchip.system.BaseConfig)
 class DefaultSmallConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.system.DefaultSmallConfig)

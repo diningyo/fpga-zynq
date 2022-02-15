@@ -40,7 +40,6 @@ class Top(implicit val p: Parameters) extends Module {
 }
 
 class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
-    with HasHierarchicalBusTopology
     with CanHaveMasterAXI4MemPort
     with HasPeripheryBootROM
     with HasAsyncExtInterrupts
