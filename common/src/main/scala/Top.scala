@@ -41,16 +41,20 @@ class Top(implicit val p: Parameters) extends Module {
 
 class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
     with CanHaveMasterAXI4MemPort
-    with HasPeripheryBootROM
     with HasAsyncExtInterrupts
     with CanHavePeripherySerial
     with CanHavePeripheryBlockDevice {
+
+  // optionally add ROM devices
+  // Note that setting BootROMLocated will override the reset_vector for all tiles
+  val bootROM  = p(BootROMLocated(location)).map { BootROM.attach(_, this, CBUS) }
+  val maskROMs = p(MaskROMLocated(location)).map { MaskROM.attach(_, this, CBUS) }
+
   override lazy val module = new FPGAZynqTopModule(this)
 }
 
 class FPGAZynqTopModule(outer: FPGAZynqTop) extends RocketSubsystemModuleImp(outer)
     with HasRTCModuleImp
-    with HasPeripheryBootROMModuleImp
     with HasExtInterruptsModuleImp
     with CanHavePeripherySerialModuleImp
     with CanHavePeripheryBlockDeviceModuleImp

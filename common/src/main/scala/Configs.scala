@@ -1,16 +1,16 @@
 package zynq
 
 import chisel3._
-import freechips.rocketchip.config.{Parameters, Config}
+import freechips.rocketchip.config.{Config, Parameters}
 import freechips.rocketchip.subsystem._
-import freechips.rocketchip.devices.tilelink.BootROMParams
-import freechips.rocketchip.rocket.{RocketCoreParams, MulDivParams, DCacheParams, ICacheParams}
+import freechips.rocketchip.devices.tilelink.{BootROMLocated, BootROMParams}
+import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
 import freechips.rocketchip.tile.{RocketTileParams, XLen}
 import testchipip._
 
 class WithBootROM extends Config((site, here, up) => {
-  case BootROMParams => BootROMParams(
-    contentFileName = s"../testchipip/bootrom/bootrom.rv${site(XLen)}.img")
+  case BootROMLocated(InSubsystem) => Some(BootROMParams(
+    contentFileName = s"../testchipip/bootrom/bootrom.rv${site(XLen)}.img"))
 })
 
 class WithZynqAdapter extends Config((site, here, up) => {
