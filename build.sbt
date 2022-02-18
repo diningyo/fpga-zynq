@@ -29,5 +29,13 @@ lazy val chiselSettings = Seq(
   //addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % chiselVersion cross CrossVersion.full)
 )
 
-lazy val zynq = (project in file("."))
+lazy val rocketchip = project in file("rocket-chip")
+
+lazy val testchipip = project
+  .dependsOn(rocketchip)
+
+lazy val `fpga-zynq` = (project in file("."))
   .settings(commonSettings, chiselSettings)
+  .dependsOn(rocketchip)
+  .dependsOn(testchipip)
+
