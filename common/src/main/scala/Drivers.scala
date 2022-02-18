@@ -209,10 +209,10 @@ class SerialDriver(implicit p: Parameters) extends LazyModule {
 
   lazy val module = new LazyModuleImp(this) {
     val (tl, edge) = node.out(0)
-    require(edge.bundle.dataBits == SERIAL_IF_WIDTH)
+    require(edge.bundle.dataBits == SERIAL_TSI_WIDTH)
 
     val io = IO(new Bundle {
-      val serial = new SerialIO(SERIAL_IF_WIDTH)
+      val serial = new SerialIO(SERIAL_TSI_WIDTH)
     })
 
     indrv.module.io.in <> io.serial.in

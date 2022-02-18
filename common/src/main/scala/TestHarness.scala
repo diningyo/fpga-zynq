@@ -32,8 +32,8 @@ class TestHarness(implicit val p: Parameters) extends Module {
   dut.tieOffInterrupts()
   dut.dontTouchPorts()
 
-  driver.io.serial <> dut.serial.get
-  driver.io.bdev <> dut.bdev.get
+  driver.io.serial <> ldut.serial_tl.get
+  driver.io.bdev <> ldut.bdev.get
   io.success := driver.io.success
 }
 
@@ -57,13 +57,13 @@ class TestHarnessDriver(implicit p: Parameters) extends LazyModule {
 
   lazy val module = new LazyModuleImp(this) {
     val io = IO(new Bundle {
-      val serial = Flipped(new SerialIO(SERIAL_IF_WIDTH))
+      val serial = Flipped(new SerialIO(SERIAL_TSI_WIDTH))
       val bdev = Flipped(new BlockDeviceIO)
       val sys_reset = Output(Bool())
       val success = Output(Bool())
     })
 
-    val simSerial = Module(new SimSerial(SERIAL_IF_WIDTH))
+    val simSerial = Module(new SimSerial(SERIAL_TSI_WIDTH))
     val simBlockDev = Module(new SimBlockDevice)
     simSerial.io.clock := clock
     simSerial.io.reset := reset

@@ -19,15 +19,15 @@ trait ZynqAdapterCoreBundle extends Bundle {
   implicit val p: Parameters
 
   val sys_reset = Output(Bool())
-  val serial = Flipped(new SerialIO(SERIAL_IF_WIDTH))
-  val bdev = Flipped(new BlockDeviceIO)
+  val serial = Flipped(new ClockedIO(new SerialIO(SERIAL_TSI_WIDTH)))
+  val bdev = Flipped(new ClockedIO(new BlockDeviceIO))
 }
 
 trait ZynqAdapterCoreModule extends HasRegMap
     with HasBlockDeviceParameters {
   implicit val p: Parameters
   val io: ZynqAdapterCoreBundle
-  val w = SERIAL_IF_WIDTH
+  val w = SERIAL_TSI_WIDTH
 
   val serDepth = p(SerialFIFODepth)
   val bdevDepth = p(BlockDeviceFIFODepth)
@@ -37,8 +37,8 @@ trait ZynqAdapterCoreModule extends HasRegMap
   val ser_out_fifo = Module(new Queue(UInt(w.W), serDepth))
   val ser_in_fifo  = Module(new Queue(UInt(w.W), serDepth))
 
-  ser_out_fifo.io.enq <> io.serial.out
-  io.serial.in <> ser_in_fifo.io.deq
+  ser_out_fifo.io.enq <> io.serial.bits.out
+  io.serial.bits.in <> ser_in_fifo.io.deq
 
   val sys_reset = RegInit(true.B)
   io.sys_reset := sys_reset
@@ -49,11 +49,11 @@ trait ZynqAdapterCoreModule extends HasRegMap
   val bdev_info = Reg(new BlockDeviceInfo)
   val bdev_serdes = Module(new BlockDeviceSerdes(w))
 
-  bdev_serdes.io.bdev <> io.bdev
+  bdev_serdes.io.bdev <> io.bdev.bits
   bdev_req_fifo.io.enq <> bdev_serdes.io.ser.req
   bdev_data_fifo.io.enq <> bdev_serdes.io.ser.data
   bdev_serdes.io.ser.resp <> bdev_resp_fifo.io.deq
-  io.bdev.info := bdev_info
+  io.bdev.bits.info := bdev_info
 
   val ser_in_space = (serDepth.U - ser_in_fifo.io.count)
   val bdev_resp_space = (bdevDepth.U - bdev_resp_fifo.io.count)
@@ -110,8 +110,8 @@ class ZynqAdapter(address: BigInt, config: Option[SlavePortParams])(implicit p: 
   lazy val module = new LazyModuleImp(this) {
     val io = IO(new Bundle {
       val sys_reset = Output(Bool())
-      val serial = Flipped(new SerialIO(SERIAL_IF_WIDTH))
-      val bdev = Flipped(new BlockDeviceIO)
+      val serial = Flipped(new ClockedIO(new SerialIO(SERIAL_TSI_WIDTH)))
+      val bdev = Flipped(new ClockedIO(new BlockDeviceIO))
     })
     val axi = IO(Flipped(node.out(0)._1.cloneType))
     node.out(0)._1 <> axi

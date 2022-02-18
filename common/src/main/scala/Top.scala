@@ -27,8 +27,8 @@ class Top(implicit val p: Parameters) extends Module {
 
   io.mem_axi <> ltarget.mem_axi4.head
   adapter.axi <> io.ps_axi_slave
-  adapter.io.serial <> target.serial.get
-  adapter.io.bdev <> target.bdev.get
+  adapter.io.serial <> ltarget.serial_tl.get.getWrappedValue
+  adapter.io.bdev <> ltarget.bdev.get
 
   Debug.tieoffDebug(target.debug, target.resetctrl, Some(target.psd))
   target.debug.get.dmactiveAck := false.B
@@ -42,7 +42,7 @@ class Top(implicit val p: Parameters) extends Module {
 class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
     with CanHaveMasterAXI4MemPort
     with HasAsyncExtInterrupts
-    with CanHavePeripherySerial
+    with CanHavePeripheryTLSerial
     with CanHavePeripheryBlockDevice {
 
   // optionally add ROM devices
@@ -56,6 +56,4 @@ class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
 class FPGAZynqTopModule(outer: FPGAZynqTop) extends RocketSubsystemModuleImp(outer)
     with HasRTCModuleImp
     with HasExtInterruptsModuleImp
-    with CanHavePeripherySerialModuleImp
-    with CanHavePeripheryBlockDeviceModuleImp
     with DontTouch

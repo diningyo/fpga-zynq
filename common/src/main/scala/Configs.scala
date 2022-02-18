@@ -21,7 +21,15 @@ class WithZynqAdapter extends Config((site, here, up) => {
   case ExtIn => up(ExtIn, site).map(_.copy(beatBytes = 4, idBits = 12))
   case BlockDeviceKey => Some(BlockDeviceConfig(nTrackers = 2))
   case BlockDeviceFIFODepth => 16
-  case SerialKey => true
+  case SerialTLKey => Some(SerialTLParams(
+    memParams = MasterPortParams(
+      base = BigInt("10000000", 16),
+      size = BigInt("00001000", 16),
+      beatBytes = site(MemoryBusKey).beatBytes,
+      idBits = 4
+    ),
+    width = 4
+  ))
   case NetworkFIFODepth => 16
 })
 
