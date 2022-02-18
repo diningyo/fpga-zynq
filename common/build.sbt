@@ -23,9 +23,9 @@ lazy val commonSettings = Seq(
   ),
 )
 
-//val chiselVersion = "3.4.3"
+val chiselVersion = "3.3.0"
 lazy val chiselSettings = Seq(
-  //libraryDependencies ++= Seq("edu.berkeley.cs" %% "chisel3" % chiselVersion),
+  libraryDependencies ++= Seq("edu.berkeley.cs" %% "chisel3" % chiselVersion),
   //addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % chiselVersion cross CrossVersion.full)
 )
 
