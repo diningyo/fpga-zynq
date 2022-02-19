@@ -6,8 +6,6 @@ TOP_MODULE_PROJECT ?= zynq
 TOP_MODULE ?= Top
 CFG_PROJECT ?= $(TOP_MODULE_PROJECT)
 CONFIG ?= ZynqConfig
-SCALA_VERSION=2.12.4
-EXTRA_PACKAGES=testchipip
 
 base_dir = $(abspath ..)
 common = $(base_dir)/common
@@ -17,8 +15,6 @@ output_delivery = deliver_output
 SHELL := /bin/bash
 
 bootrom_img = $(testchipip)/bootrom/bootrom.rv64.img $(testchipip)/bootrom/bootrom.rv32.img
-rocketchip_stamp = $(common)/lib/rocketchip.stamp
-extra_stamps = $(addprefix $(common)/lib/,$(addsuffix .stamp,$(EXTRA_PACKAGES)))
 
 ifneq ($(BOARD_MODEL),)
 	insert_board = s/\# REPLACE FOR OFFICIAL BOARD NAME/set_property "board_part" "$(BOARD_MODEL)"/g
@@ -53,14 +49,10 @@ $(FIRRTL_JAR): $(shell find $(ROCKET_DIR)/firrtl/src/main/scala -iname "*.scala"
 
 CHISEL_ARGS := $(common_build)
 
-lookup_scala_srcs = $(shell find $(1)/. -iname "*.scala" 2> /dev/null)
-
 # Initialize rocket-chip submodule
 # ------------------------------------------------------------------------------
-
 init-submodules:
-	cd $(base_dir) && git submodule update --init rocket-chip $(EXTRA_PACKAGES)
-	cd $(ROCKET_DIR) && git submodule update --init
+	cd $(base_dir) && git submodule update --init --recursive
 
 # Specialize sources for board
 # ------------------------------------------------------------------------------
@@ -78,29 +70,14 @@ src/tcl/make_bitstream_$(CONFIG).tcl: $(common)/make_bitstream.tcl
 src/verilog/%.v: $(ROCKET_DIR)/vsrc/%.v
 	cp $< $@
 
-$(ROCKET_DIR)/lib/firrtl.jar: $(FIRRTL_JAR)
-	mkdir -p $(@D)
-	cp $< $@
-
-$(rocketchip_stamp): $(call lookup_scala_srcs, $(ROCKET_DIR)) $(ROCKET_DIR)/lib/firrtl.jar
-	cd $(ROCKET_DIR) && $(SBT) pack
-	mkdir -p $(common)/lib
-	cp $(ROCKET_DIR)/target/pack/lib/* $(common)/lib
-	touch $(rocketchip_stamp)
-
-$(common)/Makefrag.pkgs: $(common)/generate-pkg-mk.sh
-	bash $(common)/generate-pkg-mk.sh $(EXTRA_PACKAGES) > $@
-
--include $(common)/Makefrag.pkgs
-
 PROJECT:=zynq
 
-$(common_build)/$(TOP_MODULE).$(CONFIG).fir: $(rocketchip_stamp) $(extra_stamps) $(bootrom_img) $(call lookup_scala_srcs,$(common))
+$(common_build)/$(TOP_MODULE).$(CONFIG).fir: $(bootrom_img)
 	mkdir -p $(@D)
-	cd $(common) && $(SBT) "runMain freechips.rocketchip.system.Generator -td $(CHISEL_ARGS) -T $(PROJECT).Top -C $(PROJECT).$(CONFIG) -n Top.$(CONFIG)"
+	cd $(base_dir) && $(SBT) "runMain freechips.rocketchip.system.Generator -td $(CHISEL_ARGS) -T $(PROJECT).Top -C $(PROJECT).$(CONFIG) -n Top.$(CONFIG)"
 
 $(common_build)/$(TOP_MODULE).$(CONFIG).v: $(common_build)/$(TOP_MODULE).$(CONFIG).fir $(FIRRTL_JAR)
-	$(FIRRTL) -i $< -o $@ -X verilog
+	cd $(base_dir) && $(FIRRTL) -i $< -o $@ -X verilog
 
 src/verilog/$(TOP_MODULE).$(CONFIG).v: $(common_build)/$(TOP_MODULE).$(CONFIG).v
 	cp $< $@
