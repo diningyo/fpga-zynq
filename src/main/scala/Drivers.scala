@@ -156,7 +156,7 @@ class SetRegisterDriver(name: String, addr: BigInt, n: Int)
     val values = Reg(Vec(n, UInt(dataBits.W)))
 
     val value_diff = Cat(io.values.zip(values).map {
-      case (iovalue, value) => iovalue != value
+      case (iovalue, value) => iovalue =/= value
     }.reverse)
     val value_set = RegInit(UInt(n.W), ~0.U(n.W))
     val value_set_oh = PriorityEncoderOH(value_set)

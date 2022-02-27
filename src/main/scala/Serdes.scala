@@ -9,8 +9,6 @@ class BlockDeviceSerialIO(w: Int) extends Bundle {
   val req = Decoupled(UInt(w.W))
   val data = Decoupled(UInt(w.W))
   val resp = Flipped(Decoupled(UInt(w.W)))
-
-  override def cloneType = new BlockDeviceSerialIO(w).asInstanceOf[this.type]
 }
 
 class BlockDeviceSerdes(w: Int)(implicit p: Parameters)
